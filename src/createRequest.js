@@ -6,7 +6,7 @@ function createRequest(initialValue, request) {
     state = {
       isLoading: true,
       data: initialValue,
-      error: false
+      error: null
     };
 
     componentDidMount() {
@@ -40,12 +40,12 @@ function createRequest(initialValue, request) {
       request(args).then(
         data => {
           if (this.latestRequestId === requestId) {
-            this.setState({ data, isLoading: false, error: false });
+            this.setState({ data, isLoading: false, error: null });
           }
         },
         error => {
           if (this.latestRequestId === requestId) {
-            this.setState({ data: error, isLoading: false, error: true });
+            this.setState({ isLoading: false, error });
           }
         }
       );
