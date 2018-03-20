@@ -12,7 +12,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
