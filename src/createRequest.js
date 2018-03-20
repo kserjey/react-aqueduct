@@ -14,8 +14,8 @@ function createRequest(initialValue, request) {
     }
 
     componentWillReceiveProps(nextProps) {
-      const nextArgs = omit(nextProps, ["render"]);
-      const currentArgs = omit(this.props, ["render"]);
+      const nextArgs = omit(nextProps, ['render']);
+      const currentArgs = omit(this.props, ['render']);
 
       if (!shallowEqual(currentArgs, nextArgs)) {
         this.shouldUpdate = true;
@@ -35,15 +35,15 @@ function createRequest(initialValue, request) {
     fetchData = () => {
       this.latestRequestId += 1;
       const requestId = this.latestRequestId;
-      const args = omit(this.props, ["render"]);
+      const args = omit(this.props, ['render']);
 
       request(args).then(
-        data => {
+        (data) => {
           if (this.latestRequestId === requestId) {
             this.setState({ data, isLoading: false, error: null });
           }
         },
-        error => {
+        (error) => {
           if (this.latestRequestId === requestId) {
             this.setState({ isLoading: false, error });
           }
