@@ -3,7 +3,7 @@ import uglify from 'rollup-plugin-uglify';
 import pkg from './package.json';
 
 export default {
-  input: 'src/index.js',
+  input: 'src/react-request.js',
   output: {
     file: pkg.main,
     format: 'cjs'
@@ -11,5 +11,6 @@ export default {
   plugins: [
     babel({ exclude: 'node_modules/**' }),
     uglify()
-  ]
+  ],
+  external: ['react']
 }
