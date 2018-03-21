@@ -10,6 +10,7 @@ function createRequest(initialValue, request) {
     };
 
     componentDidMount() {
+      this.mounted = true;
       this.fetchData();
     }
 
@@ -30,6 +31,11 @@ function createRequest(initialValue, request) {
       }
     }
 
+    componentWillUnmount() {
+      this.mounted = false;
+    }
+
+    mounted = false;
     latestRequestId = 0;
 
     fetchData = () => {
@@ -39,12 +45,12 @@ function createRequest(initialValue, request) {
 
       request(args).then(
         (data) => {
-          if (this.latestRequestId === requestId) {
+          if (this.mounted && this.latestRequestId === requestId) {
             this.setState({ data, isLoading: false, error: null });
           }
         },
         (error) => {
-          if (this.latestRequestId === requestId) {
+          if (this.mounted && this.latestRequestId === requestId) {
             this.setState({ isLoading: false, error });
           }
         }
