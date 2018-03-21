@@ -46,12 +46,16 @@ function createRequest(initialValue, request) {
       request(args).then(
         (data) => {
           if (this.mounted && this.latestRequestId === requestId) {
-            this.setState({ data, isLoading: false, error: null });
+            this.setState({ data, isLoading: false, error: null }, () => {
+              this.props.onFulfilled(data);
+            });
           }
         },
         (error) => {
           if (this.mounted && this.latestRequestId === requestId) {
-            this.setState({ isLoading: false, error });
+            this.setState({ isLoading: false, error }, () => {
+              this.props.onRejected(error);
+            });
           }
         }
       );
