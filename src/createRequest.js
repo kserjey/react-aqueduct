@@ -1,8 +1,15 @@
 import React from 'react';
 import { shallowEqual, omit } from './utils';
 
+const getArgs = props => omit(props, ['render', 'onFulfilled', 'onRejected']);
+
 function createRequest(initialValue, request) {
   return class RequestComponent extends React.Component {
+    static defaultProps = {
+      onFulfilled: () => {},
+      onRejected: () => {}
+    };
+
     state = {
       isLoading: true,
       data: initialValue,
@@ -15,19 +22,13 @@ function createRequest(initialValue, request) {
     }
 
     componentWillReceiveProps(nextProps) {
-      const nextArgs = omit(nextProps, ['render']);
-      const currentArgs = omit(this.props, ['render']);
+      const nextArgs = getArgs(nextProps);
+      const args = getArgs(this.props);
 
-      if (!shallowEqual(currentArgs, nextArgs)) {
-        this.shouldUpdate = true;
-        this.setState({ isLoading: true });
-      }
-    }
-
-    componentDidUpdate() {
-      if (this.shouldUpdate) {
-        this.shouldUpdate = false;
-        this.fetchData();
+      if (!shallowEqual(args, nextArgs)) {
+        this.setState({ isLoading: true }, () => {
+          this.fetchData();
+        });
       }
     }
 
@@ -41,7 +42,7 @@ function createRequest(initialValue, request) {
     fetchData = () => {
       this.latestRequestId += 1;
       const requestId = this.latestRequestId;
-      const args = omit(this.props, ['render']);
+      const args = getArgs(this.props);
 
       request(args).then(
         (data) => {
