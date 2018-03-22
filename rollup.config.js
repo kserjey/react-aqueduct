@@ -3,7 +3,7 @@ import uglify from 'rollup-plugin-uglify';
 import pkg from './package.json';
 
 export default {
-  input: 'src/react-request.js',
+  input: 'src/react-aqueduct.js',
   output: {
     file: pkg.main,
     format: 'cjs'

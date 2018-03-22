@@ -1,14 +1,14 @@
 {
-  "name": "react-request",
+  "name": "react-aqueduct",
   "version": "0.1.0",
   "files": [
     "lib"
   ],
-  "main": "lib/react-request.js",
+  "main": "lib/react-aqueduct.js",
   "author": "Sergey Korchinskiy <k.serjey@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kserjey/react-request.git"
+    "url": "git+https://github.com/kserjey/react-aqueduct.git"
   },
   "license": "MIT",
   "scripts": {
@@ -33,5 +33,6 @@
     "rollup": "^0.57.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-uglify": "^3.0.0"
-  }
+  },
+  "dependencies": {}
 }
