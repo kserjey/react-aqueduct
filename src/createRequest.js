@@ -1,17 +1,37 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { shallowEqual, omit } from './utils';
 
 const getArgs = props => omit(props, ['render', 'onFulfilled', 'onRejected']);
+const getRenderProps = state => omit(state, ['requestId']);
 
 function createRequest(initialValue, request) {
   return class RequestComponent extends React.Component {
+    static propTypes = {
+      render: PropTypes.func.isRequired,
+      onFulfilled: PropTypes.func,
+      onRejected: PropTypes.func
+    };
+
     static defaultProps = {
       onFulfilled: () => {},
       onRejected: () => {}
     };
 
+    static getDerivedStateFromProps(nextProps, { args, requestId }) {
+      const nextArgs = getArgs(nextProps);
+
+      if (!shallowEqual(args, nextArgs)) {
+        return { isLoading: true, requestId: requestId + 1, args: nextArgs };
+      }
+
+      return null;
+    }
+
     state = {
       isLoading: true,
+      requestId: 0,
+      args: getArgs(this.props),
       data: initialValue,
       error: null
     };
@@ -21,14 +41,9 @@ function createRequest(initialValue, request) {
       this.fetchData();
     }
 
-    componentWillReceiveProps(nextProps) {
-      const nextArgs = getArgs(nextProps);
-      const args = getArgs(this.props);
-
-      if (!shallowEqual(args, nextArgs)) {
-        this.setState({ isLoading: true }, () => {
-          this.fetchData();
-        });
+    componentDidUpdate(prevProps, prevState) {
+      if (prevState.requestId < this.state.requestId) {
+        this.fetchData();
       }
     }
 
@@ -37,23 +52,20 @@ function createRequest(initialValue, request) {
     }
 
     mounted = false;
-    latestRequestId = 0;
 
     fetchData = () => {
-      this.latestRequestId += 1;
-      const requestId = this.latestRequestId;
-      const args = getArgs(this.props);
+      const thisId = this.state.requestId;
 
-      request(args).then(
+      request(this.state.args).then(
         (data) => {
-          if (this.mounted && this.latestRequestId === requestId) {
+          if (this.mounted && this.state.requestId === thisId) {
             this.setState({ data, isLoading: false, error: null }, () => {
               this.props.onFulfilled(data);
             });
           }
         },
         (error) => {
-          if (this.mounted && this.latestRequestId === requestId) {
+          if (this.mounted && this.state.requestid === thisId) {
             this.setState({ isLoading: false, error }, () => {
               this.props.onRejected(error);
             });
@@ -63,7 +75,8 @@ function createRequest(initialValue, request) {
     };
 
     render() {
-      return this.props.render(this.state);
+      const renderProps = getRenderProps(this.state);
+      return this.props.render(renderProps);
     }
   };
 }
