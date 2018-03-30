@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import polyfill from 'react-lifecycles-compat';
 import { shallowEqual, omit } from './utils';
 
 const getArgs = props => omit(props, ['render', 'onFulfilled', 'onRejected']);
 const getRenderProps = state => omit(state, ['requestId']);
 
 function createRequest(initialValue, request) {
-  return class RequestComponent extends React.Component {
+  class RequestComponent extends React.Component {
     static propTypes = {
       render: PropTypes.func.isRequired,
       onFulfilled: PropTypes.func,
@@ -78,7 +79,9 @@ function createRequest(initialValue, request) {
       const renderProps = getRenderProps(this.state);
       return this.props.render(renderProps);
     }
-  };
+  }
+
+  return polyfill(RequestComponent);
 }
 
 export default createRequest;
