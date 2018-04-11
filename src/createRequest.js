@@ -10,11 +10,13 @@ function createRequest(initialValue, request) {
   class RequestComponent extends React.Component {
     static propTypes = {
       render: PropTypes.func.isRequired,
+      waiting: PropTypes.bool,
       onFulfilled: PropTypes.func,
       onRejected: PropTypes.func
     };
 
     static defaultProps = {
+      waiting: false,
       onFulfilled: () => {},
       onRejected: () => {}
     };
@@ -55,24 +57,26 @@ function createRequest(initialValue, request) {
     mounted = false;
 
     fetchData = () => {
-      const thisId = this.state.requestId;
+      if (!this.props.waiting) {
+        const thisId = this.state.requestId;
 
-      request(this.state.args).then(
-        (data) => {
-          if (this.mounted && this.state.requestId === thisId) {
-            this.setState({ data, isLoading: false, error: null }, () => {
-              this.props.onFulfilled(data);
-            });
+        request(this.state.args).then(
+          (data) => {
+            if (this.mounted && this.state.requestId === thisId) {
+              this.setState({ data, isLoading: false, error: null }, () => {
+                this.props.onFulfilled(data);
+              });
+            }
+          },
+          (error) => {
+            if (this.mounted && this.state.requestid === thisId) {
+              this.setState({ isLoading: false, error }, () => {
+                this.props.onRejected(error);
+              });
+            }
           }
-        },
-        (error) => {
-          if (this.mounted && this.state.requestid === thisId) {
-            this.setState({ isLoading: false, error }, () => {
-              this.props.onRejected(error);
-            });
-          }
-        }
-      );
+        );
+      }
     };
 
     render() {
