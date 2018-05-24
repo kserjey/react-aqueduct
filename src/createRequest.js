@@ -6,11 +6,13 @@ import { shallowEqual, omit } from './utils';
 const getArgs = props => omit(props, ['render', 'onFulfilled', 'onRejected']);
 const getRenderProps = state => omit(state, ['requestId']);
 
-function createRequest(initialValue, request) {
+function createRequest(initialValue, mapPropsToRequest) {
   class RequestComponent extends React.Component {
     static propTypes = {
-      render: PropTypes.func.isRequired,
       waiting: PropTypes.bool,
+      component: PropTypes.func,
+      render: PropTypes.func,
+      children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
       onFulfilled: PropTypes.func,
       onRejected: PropTypes.func
     };
@@ -60,7 +62,7 @@ function createRequest(initialValue, request) {
       if (!this.props.waiting) {
         const thisId = this.state.requestId;
 
-        request(this.state.args).then(
+        mapPropsToRequest(this.state.args).then(
           (data) => {
             if (this.mounted && this.state.requestId === thisId) {
               this.setState({ data, isLoading: false, error: null }, () => {
@@ -80,8 +82,13 @@ function createRequest(initialValue, request) {
     };
 
     render() {
+      const { render, component, children } = this.props;
       const renderProps = getRenderProps(this.state);
-      return this.props.render(renderProps);
+
+      if (component) return React.createElement(component, renderProps);
+      if (render) return render(renderProps);
+      if (typeof children === 'function') return children(renderProps);
+      return null;
     }
   }
 
