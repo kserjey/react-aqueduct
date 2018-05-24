@@ -12,7 +12,7 @@ export default {
   },
   plugins: [
     babel({ exclude: 'node_modules/**' }),
-    process.env.NODE_ENV === PROD || uglify()
+    process.env.NODE_ENV === PROD && uglify()
   ],
   external: ['react']
 };
