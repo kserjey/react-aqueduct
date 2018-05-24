@@ -1,8 +1,6 @@
 import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+import filesize from 'rollup-plugin-filesize';
 import pkg from './package.json';
-
-const PROD = 'production';
 
 export default {
   input: 'src/index.js',
@@ -12,7 +10,7 @@ export default {
   },
   plugins: [
     babel({ exclude: 'node_modules/**' }),
-    process.env.NODE_ENV === PROD && uglify()
+    filesize()
   ],
-  external: ['react']
+  external: ['react', ...Object.keys(pkg.dependencies)]
 };
