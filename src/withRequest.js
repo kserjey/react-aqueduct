@@ -3,16 +3,18 @@ import hoistNonReactStatics from 'hoist-non-react-statics';
 import createRequest from './createRequest';
 import { getDisplayName } from './utils';
 
-function withRequest({ initialValue, mapPropsToRequest, ...options }) {
+function withRequest({ initialValue, mapPropsToRequest }) {
   const RequestComponent = createRequest(initialValue, mapPropsToRequest);
   return (Component) => {
     const componentDisplayName = getDisplayName(Component);
 
-    function RequestHOC(props) {
-      return <RequestComponent {...props} {...options} component={Component}/>;
+    class RequestHOC extends React.Component {
+      static displayName = `withRequest(${componentDisplayName})`;
+      renderRequest = requestProps => <RequestComponent {...this.props} {...requestProps}/>
+      render() {
+        return <RequestComponent render={this.renderRequest}/>;
+      }
     }
-
-    RequestHOC.displayName = `withRequest(${componentDisplayName})`;
 
     return hoistNonReactStatics(RequestHOC, Component);
   };
