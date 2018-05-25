@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { polyfill } from 'react-lifecycles-compat';
 import { shallowEqual, omit } from './utils';
 
-const getArgs = props => omit(props, ['wating', 'component', 'render', 'children', 'onFulfilled', 'onRejected']);
+const getArgs = props => omit(props, ['component', 'render', 'children', 'onFulfilled', 'onRejected']);
 const getRenderProps = state => omit(state, ['requestId']);
 
 function createRequest(initialValue, mapPropsToRequest) {
   class RequestComponent extends React.Component {
     static propTypes = {
-      waiting: PropTypes.bool,
       component: PropTypes.func,
       render: PropTypes.func,
       children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
@@ -18,7 +17,6 @@ function createRequest(initialValue, mapPropsToRequest) {
     };
 
     static defaultProps = {
-      waiting: false,
       onFulfilled: () => {},
       onRejected: () => {}
     };
@@ -59,10 +57,11 @@ function createRequest(initialValue, mapPropsToRequest) {
     mounted = false;
 
     fetchData = () => {
-      if (!this.props.waiting) {
-        const thisId = this.state.requestId;
+      const thisId = this.state.requestId;
+      const request = mapPropsToRequest(this.state.args);
 
-        mapPropsToRequest(this.state.args).then(
+      if (request !== null && request !== false) {
+        request.then(
           (data) => {
             if (this.mounted && this.state.requestId === thisId) {
               this.setState({ data, isLoading: false, error: null }, () => {
@@ -79,7 +78,7 @@ function createRequest(initialValue, mapPropsToRequest) {
           }
         );
       }
-    };
+    }
 
     render() {
       const { render, component, children } = this.props;
