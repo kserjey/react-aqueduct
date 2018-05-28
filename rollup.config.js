@@ -9,7 +9,10 @@ export default {
     format: 'cjs'
   },
   plugins: [
-    babel({ exclude: 'node_modules/**' }),
+    babel({
+      exclude: 'node_modules/**',
+      plugins: ['external-helpers']
+    }),
     filesize()
   ],
   external: ['react', ...Object.keys(pkg.dependencies)]
