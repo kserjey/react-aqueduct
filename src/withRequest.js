@@ -10,9 +10,9 @@ function withRequest({ initialValue, mapPropsToRequest }) {
 
     class RequestHOC extends React.Component {
       static displayName = `withRequest(${componentDisplayName})`;
-      renderRequest = requestProps => <RequestComponent {...this.props} {...requestProps}/>
+      renderRequest = requestProps => <Component {...this.props} {...requestProps}/>
       render() {
-        return <RequestComponent render={this.renderRequest}/>;
+        return <RequestComponent {...this.props} render={this.renderRequest}/>;
       }
     }
 
