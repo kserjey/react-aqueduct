@@ -4,7 +4,7 @@ import { polyfill } from 'react-lifecycles-compat';
 import { shallowEqual, omit } from './utils';
 
 const getArgs = props => omit(props, ['component', 'render', 'children', 'onFulfilled', 'onRejected']);
-const getRenderProps = state => omit(state, ['requestId']);
+const getRenderProps = state => omit(state, ['requestId', 'args']);
 
 function createRequest(initialValue, mapPropsToRequest) {
   class RequestComponent extends React.Component {
