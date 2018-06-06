@@ -3,20 +3,29 @@ import PropTypes from 'prop-types';
 import { polyfill } from 'react-lifecycles-compat';
 import { shallowEqual, omit } from './utils';
 
-const getArgs = props => omit(props, ['component', 'render', 'children', 'onFulfilled', 'onRejected']);
+const propTypes = {
+  initialValue: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.number,
+    PropTypes.string,
+    PropTypes.array,
+    PropTypes.object
+  ]),
+  component: PropTypes.func,
+  render: PropTypes.func,
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+  onFulfilled: PropTypes.func,
+  onRejected: PropTypes.func
+};
+
+const getArgs = props => omit(props, Object.keys(propTypes));
 const getRenderProps = state => omit(state, ['requestId', 'args']);
 
 function createRequest(initialValue, mapPropsToRequest) {
   class RequestComponent extends React.Component {
-    static propTypes = {
-      component: PropTypes.func,
-      render: PropTypes.func,
-      children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-      onFulfilled: PropTypes.func,
-      onRejected: PropTypes.func
-    };
-
+    static propTypes = propTypes;
     static defaultProps = {
+      initialValue,
       onFulfilled: () => {},
       onRejected: () => {}
     };
@@ -35,7 +44,7 @@ function createRequest(initialValue, mapPropsToRequest) {
       isLoading: true,
       requestId: 0,
       args: getArgs(this.props),
-      data: initialValue,
+      data: this.props.initialValue,
       error: null
     };
 
@@ -78,7 +87,7 @@ function createRequest(initialValue, mapPropsToRequest) {
           }
         );
       }
-    }
+    };
 
     render() {
       const { render, component, children } = this.props;
