@@ -3,6 +3,7 @@
   "extends": ["airbnb", "prettier", "prettier/react"],
   "rules": {
     "radix": ["error", "as-needed"],
+    "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
     "jsx-quotes": ["error", "prefer-single"],
     "react/jsx-filename-extension": ["error", { "extensions": [".js"] }],
     "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "never" }],
