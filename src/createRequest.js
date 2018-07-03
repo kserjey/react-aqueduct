@@ -65,9 +65,9 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     mounted = false;
 
-    fetchData = () => {
+    fetchData = (args = this.state.args) => {
       const thisId = this.state.requestId;
-      const request = mapPropsToRequest(this.state.args);
+      const request = mapPropsToRequest(args);
 
       if (request !== null && request !== false) {
         request.then(
@@ -91,7 +91,10 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     render() {
       const { render, component, children } = this.props;
-      const renderProps = getRenderProps(this.state);
+
+      const renderProps = Object.assign({}, getRenderProps(this.state), {
+        updateData: this.fetchData
+      });
 
       if (component) return React.createElement(component, renderProps);
       if (render) return render(renderProps);
