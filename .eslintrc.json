@@ -1,15 +1,13 @@
 {
-    "parser": "babel-eslint",
-    "extends": ["airbnb"],
-    "rules": {
-        "radix": ["error", "as-needed"],
-        "comma-dangle": ["error", "never"],
-        "jsx-quotes": ["error", "prefer-single"],
-        "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
-        "react/jsx-filename-extension": ["error", { "extensions": [".js"] }],
-        "react/jsx-tag-spacing":  ["error", { "beforeSelfClosing": "never" }],
-        "react/require-default-props": "off",
-        "import/prefer-default-export": "off",
-        "import/no-extraneous-dependencies": "off"
-    }
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier", "prettier/react"],
+  "rules": {
+    "radix": ["error", "as-needed"],
+    "jsx-quotes": ["error", "prefer-single"],
+    "react/jsx-filename-extension": ["error", { "extensions": [".js"] }],
+    "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "never" }],
+    "react/require-default-props": "off",
+    "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": "off"
+  }
 }
