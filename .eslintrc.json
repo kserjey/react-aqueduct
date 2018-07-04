@@ -1,6 +1,9 @@
 {
   "parser": "babel-eslint",
   "extends": ["airbnb", "prettier", "prettier/react"],
+  "env": {
+    "jest": true
+  },
   "rules": {
     "radix": ["error", "as-needed"],
     "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
