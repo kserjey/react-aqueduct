@@ -65,9 +65,9 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     mounted = false;
 
-    fetchData = (args = this.state.args) => {
+    fetchData = () => {
       const thisId = this.state.requestId;
-      const request = mapPropsToRequest(args);
+      const request = mapPropsToRequest(this.state.args);
 
       if (request !== null && request !== false) {
         request.then(
@@ -89,11 +89,19 @@ function createRequest(initialValue, mapPropsToRequest) {
       }
     };
 
+    updateData = (nextArgs) => {
+      this.setState(({ requestId, args }) => ({
+        isLoading: true,
+        requestId: requestId + 1,
+        args: { ...args, ...nextArgs }
+      }));
+    };
+
     render() {
       const { render, component, children } = this.props;
 
       const renderProps = Object.assign({}, getRenderProps(this.state), {
-        updateData: this.fetchData
+        updateData: this.updateData
       });
 
       if (component) return React.createElement(component, renderProps);
