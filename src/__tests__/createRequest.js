@@ -4,7 +4,7 @@ import createRequest from '../createRequest';
 
 function fakeFetch(data) {
   return new Promise((resolve) => {
-    setTimeout(resolve, 1000, data);
+    setTimeout(resolve, 300, data);
   });
 }
 
@@ -28,6 +28,57 @@ test('make request', async () => {
   await wait(() =>
     expect(getByTestId('request-result').textContent).toBe('data')
   );
+});
+
+test('refetch data on update props', async () => {
+  const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
+
+  function DataView(props) {
+    return (
+      <FakeRequest
+        data={props.data}
+        render={({ isLoading, data }) => (
+          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
+        )}
+      />
+    );
+  }
+
+  const { rerender, getByTestId } = render(<DataView data='first'/>);
+  expect(getByTestId('request-result').textContent).toBe('loading');
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('first')
+  );
+
+  rerender(<DataView data='second'/>);
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('second')
+  );
+});
+
+test('fetch data only if props has been changed', async () => {
+  const request = jest.fn(() => fakeFetch('data'));
+  const FakeRequest = createRequest('', request);
+
+  function DataView(props) {
+    return (
+      <FakeRequest
+        data={props.data}
+        render={({ isLoading, data }) => (
+          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
+        )}
+      />
+    );
+  }
+
+  const { rerender, getByTestId } = render(<DataView data='first'/>);
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('data')
+  );
+
+  rerender(<DataView data='first'/>);
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(getByTestId('request-result').textContent).toBe('data');
 });
 
 test('refetch data on updateData', async () => {
