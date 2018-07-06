@@ -94,7 +94,7 @@ function createRequest(initialValue, mapPropsToRequest) {
       this.setState(({ requestId, args }) => ({
         isLoading: true,
         requestId: requestId + 1,
-        args: { ...args, ...nextArgs }
+        args: Object.assign({}, args, nextArgs)
       }));
     };
 
