@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { polyfill } from 'react-lifecycles-compat';
-import { shallowEqual, omit } from './utils';
+import omit from 'lodash/omit';
+import { shallowEqual } from './utils';
 
 const propTypes = {
   initialValue: PropTypes.oneOfType([

@@ -14,14 +14,11 @@ export function shallowEqual(objectA, objectB) {
   return true;
 }
 
-export function omit(object, props) {
-  const keys = Object.keys(object).filter(key => props.indexOf(key) < 0);
-  return keys.reduce((acc, key) => ({ ...acc, [key]: object[key] }), {});
-}
-
 export function getDisplayName(Component) {
-  return Component.displayName ||
-  Component.name ||
-  (Component.constructor && Component.constructor.name) ||
-  'Component';
+  return (
+    Component.displayName ||
+    Component.name ||
+    (Component.constructor && Component.constructor.name) ||
+    'Component'
+  );
 }

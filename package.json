@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "hoist-non-react-statics": "^2.5.0",
+    "lodash": "^4.17.10",
     "prop-types": "^15.6.1",
     "react-lifecycles-compat": "^3.0.4"
   }
