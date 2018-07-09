@@ -1,3 +1,5 @@
+import isFunction from 'lodash/isFunction';
+
 export function shallowEqual(objectA, objectB) {
   if (objectA === objectB) return true;
 
@@ -12,6 +14,10 @@ export function shallowEqual(objectA, objectB) {
   }
 
   return true;
+}
+
+export function isPromise(object = {}) {
+  return object !== null && isFunction(object.then);
 }
 
 export function getDisplayName(Component) {

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { polyfill } from 'react-lifecycles-compat';
 import omit from 'lodash/omit';
-import { shallowEqual } from './utils';
+import { shallowEqual, isPromise } from './utils';
 
 const propTypes = {
   initialValue: PropTypes.oneOfType([
@@ -70,7 +70,7 @@ function createRequest(initialValue, mapPropsToRequest) {
       const thisId = this.state.requestId;
       const request = mapPropsToRequest(this.state.args);
 
-      if (request !== null && request !== false) {
+      if (isPromise(request)) {
         request.then(
           (data) => {
             if (this.mounted && this.state.requestId === thisId) {
@@ -87,6 +87,8 @@ function createRequest(initialValue, mapPropsToRequest) {
             }
           }
         );
+      } else {
+        this.setState({ isLoading: false });
       }
     };
 
