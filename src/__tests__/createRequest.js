@@ -8,6 +8,15 @@ function fakeFetch(data) {
   });
 }
 
+function RequestResult({ isLoading, data, updateData }) {
+  return (
+    <div>
+      {!isLoading && <div data-testid='request-result'>{data}</div>}
+      <button onClick={() => updateData()}>update</button>
+    </div>
+  );
+}
+
 afterEach(cleanup);
 
 test('make request', async () => {
@@ -28,6 +37,15 @@ test('make request', async () => {
   await wait(() =>
     expect(getByTestId('request-result').textContent).toBe('data')
   );
+});
+
+test('do not make request if not a promise', () => {
+  const request = jest.fn(() => null);
+  const FakeRequest = createRequest('initial', request);
+
+  const { getByTestId } = render(<FakeRequest component={RequestResult}/>);
+
+  expect(getByTestId('request-result').textContent).toBe('initial');
 });
 
 test('refetch data on update props', async () => {
