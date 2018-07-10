@@ -11,7 +11,7 @@ function fakeFetch(data) {
 function RequestResult({ isLoading, data, updateData }) {
   return (
     <div>
-      {!isLoading && <div data-testid='request-result'>{data}</div>}
+      <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
       <button onClick={() => updateData()}>update</button>
     </div>
   );
@@ -23,13 +23,7 @@ test('make request', async () => {
   const request = jest.fn(() => fakeFetch('data'));
   const FakeRequest = createRequest('', request);
 
-  const { getByTestId } = render(
-    <FakeRequest
-      render={({ isLoading, data }) => (
-        <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-      )}
-    />
-  );
+  const { getByTestId } = render(<FakeRequest component={RequestResult}/>);
 
   expect(request).toHaveBeenCalled();
   expect(request).toHaveBeenCalledTimes(1);
@@ -51,24 +45,16 @@ test('do not make request if not a promise', () => {
 test('refetch data on update props', async () => {
   const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
 
-  function DataView(props) {
-    return (
-      <FakeRequest
-        data={props.data}
-        render={({ isLoading, data }) => (
-          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-        )}
-      />
-    );
-  }
+  const { rerender, getByTestId } = render(
+    <FakeRequest data='first' component={RequestResult}/>
+  );
 
-  const { rerender, getByTestId } = render(<DataView data='first'/>);
   expect(getByTestId('request-result').textContent).toBe('loading');
   await wait(() =>
     expect(getByTestId('request-result').textContent).toBe('first')
   );
 
-  rerender(<DataView data='second'/>);
+  rerender(<FakeRequest data='second' component={RequestResult}/>);
   await wait(() =>
     expect(getByTestId('request-result').textContent).toBe('second')
   );
@@ -78,23 +64,15 @@ test('fetch data only if props has been changed', async () => {
   const request = jest.fn(() => fakeFetch('data'));
   const FakeRequest = createRequest('', request);
 
-  function DataView(props) {
-    return (
-      <FakeRequest
-        data={props.data}
-        render={({ isLoading, data }) => (
-          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-        )}
-      />
-    );
-  }
+  const { rerender, getByTestId } = render(
+    <FakeRequest data='first' component={RequestResult}/>
+  );
 
-  const { rerender, getByTestId } = render(<DataView data='first'/>);
   await wait(() =>
     expect(getByTestId('request-result').textContent).toBe('data')
   );
 
-  rerender(<DataView data='first'/>);
+  rerender(<FakeRequest data='first' component={RequestResult}/>);
   expect(request).toHaveBeenCalledTimes(1);
   expect(getByTestId('request-result').textContent).toBe('data');
 });
@@ -107,14 +85,7 @@ test('refetch data on updateData', async () => {
   });
 
   const { getByTestId, getByText } = render(
-    <FakeRequest
-      render={({ isLoading, data, updateData }) => (
-        <div>
-          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-          <button onClick={() => updateData()}>update</button>
-        </div>
-      )}
-    />
+    <FakeRequest component={RequestResult}/>
   );
 
   await wait(() =>
