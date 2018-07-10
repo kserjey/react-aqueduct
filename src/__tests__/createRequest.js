@@ -60,7 +60,7 @@ test('refetch data on update props', async () => {
   );
 });
 
-test('fetch data only if props has been changed', async () => {
+test('do not refetch if props have not been changed', async () => {
   const request = jest.fn(() => fakeFetch('data'));
   const FakeRequest = createRequest('', request);
 
