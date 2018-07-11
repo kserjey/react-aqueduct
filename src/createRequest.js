@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { polyfill } from 'react-lifecycles-compat';
 import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 import { shallowEqual, isPromise } from './utils';
 
 const propTypes = {
@@ -19,8 +20,8 @@ const propTypes = {
   onRejected: PropTypes.func
 };
 
-const getArgs = props => omit(props, Object.keys(propTypes));
-const getRenderProps = state => omit(state, ['requestId', 'args']);
+const getRequestProps = props => omit(props, Object.keys(propTypes));
+const getRenderProps = state => omit(state, ['requestId', 'requestProps']);
 
 function createRequest(initialValue, mapPropsToRequest) {
   class RequestComponent extends React.Component {
@@ -31,20 +32,21 @@ function createRequest(initialValue, mapPropsToRequest) {
       onRejected: () => {}
     };
 
-    static getDerivedStateFromProps(nextProps, { args, requestId }) {
-      const nextArgs = getArgs(nextProps);
+    static getDerivedStateFromProps(nextProps, { requestProps, requestId }) {
+      const nextRequestProps = getRequestProps(nextProps);
 
-      if (!shallowEqual(args, nextArgs)) {
-        return { isLoading: true, requestId: requestId + 1, args: nextArgs };
+      if (!shallowEqual(requestProps, nextRequestProps)) {
+        return { requestId: requestId + 1, requestProps: nextRequestProps };
       }
 
       return null;
     }
 
     state = {
-      isLoading: true,
+      isLoading: false,
       requestId: 0,
-      args: getArgs(this.props),
+      requestProps: getRequestProps(this.props),
+      args: {},
       data: this.props.initialValue,
       error: null
     };
@@ -67,36 +69,44 @@ function createRequest(initialValue, mapPropsToRequest) {
     mounted = false;
 
     fetchData = () => {
-      const thisId = this.state.requestId;
-      const request = mapPropsToRequest(this.state.args);
+      const { requestId, requestProps } = this.state;
+      const usedKeys = [];
+      const proxy = new Proxy(requestProps, {
+        get(target, key) {
+          usedKeys.push(key);
+          return target[key];
+        }
+      });
+
+      const request = mapPropsToRequest(proxy);
+      const args = pick(requestProps, usedKeys);
 
       if (isPromise(request)) {
+        this.setState({ isLoading: true });
+
         request.then(
           (data) => {
-            if (this.mounted && this.state.requestId === thisId) {
-              this.setState({ data, isLoading: false, error: null }, () => {
-                this.props.onFulfilled(data);
-              });
+            if (this.mounted && this.state.requestId === requestId) {
+              this.setState({ args, data, isLoading: false, error: null }, () =>
+                this.props.onFulfilled(data)
+              );
             }
           },
           (error) => {
-            if (this.mounted && this.state.requestid === thisId) {
-              this.setState({ isLoading: false, error }, () => {
-                this.props.onRejected(error);
-              });
+            if (this.mounted && this.state.requestid === requestId) {
+              this.setState({ args, isLoading: false, error }, () =>
+                this.props.onRejected(error)
+              );
             }
           }
         );
-      } else {
-        this.setState({ isLoading: false });
       }
     };
 
     updateData = (nextArgs) => {
-      this.setState(({ requestId, args }) => ({
-        isLoading: true,
+      this.setState(({ requestId, requestProps }) => ({
         requestId: requestId + 1,
-        args: Object.assign({}, args, nextArgs)
+        requestProps: Object.assign({}, requestProps, nextArgs)
       }));
     };
 

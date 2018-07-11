@@ -33,6 +33,29 @@ test('make request', async () => {
   );
 });
 
+test('call onFulfilled on success response', (done) => {
+  const FakeRequest = createRequest('', () => fakeFetch('data'));
+  const callback = (data) => {
+    expect(data).toBe('data');
+    done();
+  };
+
+  render(<FakeRequest onFulfilled={callback}/>);
+});
+
+test('pass used args', async () => {
+  const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
+  const { getByTestId } = render(
+    <FakeRequest
+      data='data'
+      render={({ args }) => <div data-testid='argument'>{args.data}</div>}
+    />
+  );
+
+  expect(getByTestId('argument').textContent).toBe('');
+  await wait(() => expect(getByTestId('argument').textContent).toBe('data'));
+});
+
 test('do not make request if not a promise', () => {
   const request = jest.fn(() => null);
   const FakeRequest = createRequest('initial', request);
