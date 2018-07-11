@@ -43,7 +43,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     state = {
-      isLoading: false,
+      isLoading: true,
       requestId: 0,
       requestProps: getRequestProps(this.props),
       args: {},
@@ -69,7 +69,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     mounted = false;
 
     fetchData = () => {
-      const { requestId, requestProps } = this.state;
+      const { isLoading, requestId, requestProps } = this.state;
       const usedKeys = [];
       const proxy = new Proxy(requestProps, {
         get(target, key) {
@@ -82,7 +82,9 @@ function createRequest(initialValue, mapPropsToRequest) {
       const args = pick(requestProps, usedKeys);
 
       if (isPromise(request)) {
-        this.setState({ isLoading: true });
+        if (isLoading === false) {
+          this.setState({ isLoading: true });
+        }
 
         request.then(
           (data) => {
@@ -100,6 +102,8 @@ function createRequest(initialValue, mapPropsToRequest) {
             }
           }
         );
+      } else if (isLoading === true) {
+        this.setState({ isLoading: false });
       }
     };
 
