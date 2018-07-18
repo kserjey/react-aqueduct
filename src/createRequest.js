@@ -58,7 +58,6 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     componentDidMount() {
-      this.mounted = true;
       this.handleRequest();
     }
 
@@ -72,7 +71,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     componentWillUnmount() {
-      this.mounted = false;
+      this.hasUnmounted = true;
     }
 
     setLoading = (value) => {
@@ -82,7 +81,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     };
 
     request = null;
-    mounted = false;
+    hasUnmounted = false;
 
     handleRequest = () => {
       if (this.request === null) return;
@@ -90,14 +89,14 @@ function createRequest(initialValue, mapPropsToRequest) {
       this.setLoading(true);
       this.request.then(
         (data) => {
-          if (this.mounted && this.state.requestId === requestId) {
+          if (!this.hasUnmounted && this.state.requestId === requestId) {
             this.setState({ args, data, isLoading: false, error: null }, () =>
               this.props.onFulfilled(data)
             );
           }
         },
         (error) => {
-          if (this.mounted && this.state.requestid === requestId) {
+          if (!this.hasUnmounted && this.state.requestid === requestId) {
             this.setState({ args, isLoading: false, error }, () =>
               this.props.onRejected(error)
             );
