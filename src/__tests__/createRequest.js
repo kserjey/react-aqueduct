@@ -1,10 +1,13 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { render, wait, fireEvent, cleanup } from 'react-testing-library';
 import createRequest from '../createRequest';
 
-function fakeFetch(data) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 300, data);
+const defaultRequest = { delay: 100, error: false };
+function fakeFetch(data, options) {
+  const { delay, error } = Object.assign({}, defaultRequest, options);
+  return new Promise((resolve, reject) => {
+    setTimeout(error ? reject : resolve, delay, data);
   });
 }
 
@@ -41,6 +44,19 @@ test('call onFulfilled on success response', (done) => {
   };
 
   render(<FakeRequest onFulfilled={callback}/>);
+});
+
+test('call onRejected on failed response', (done) => {
+  const FakeRequest = createRequest('', () =>
+    fakeFetch('error', { error: true })
+  );
+
+  const callback = (error) => {
+    expect(error).toBe('error');
+    done();
+  };
+
+  render(<FakeRequest onRejected={callback}/>);
 });
 
 test('pass used args', async () => {
