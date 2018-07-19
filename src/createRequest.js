@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { polyfill } from 'react-lifecycles-compat';
 import omit from 'lodash/omit';
 import { shallowEqual, isPromise } from './utils';
 
@@ -20,10 +19,9 @@ const propTypes = {
 };
 
 const getRequestProps = props => omit(props, Object.keys(propTypes));
-const getRenderProps = state => omit(state, ['requestId', 'requestProps']);
 
 function createRequest(initialValue, mapPropsToRequest) {
-  class RequestComponent extends React.Component {
+  return class RequestComponent extends React.Component {
     static propTypes = propTypes;
     static defaultProps = {
       initialValue,
@@ -31,26 +29,13 @@ function createRequest(initialValue, mapPropsToRequest) {
       onRejected: () => {}
     };
 
-    static getDerivedStateFromProps(nextProps, { requestProps, requestId }) {
-      const nextRequestProps = getRequestProps(nextProps);
-
-      if (!shallowEqual(requestProps, nextRequestProps)) {
-        return { requestId: requestId + 1, requestProps: nextRequestProps };
-      }
-
-      return null;
-    }
-
     constructor(props) {
       super(props);
-      const requestProps = getRenderProps(this.props);
+      const requestProps = getRequestProps(this.props);
       const request = mapPropsToRequest(requestProps);
-
       this.request = isPromise(request) ? request : null;
       this.state = {
-        isLoading: !!this.request,
-        requestId: 0,
-        requestProps,
+        isLoading: this.request !== null,
         args: {},
         data: props.initialValue,
         error: null
@@ -58,15 +43,18 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     componentDidMount() {
-      this.handleRequest();
+      if (this.state.isLoading) {
+        this.handleRequest(this.request);
+      }
     }
 
-    componentDidUpdate(prevProps, prevState) {
-      const { requestId, requestProps } = this.state;
-      if (prevState.requestId < requestId) {
-        const request = mapPropsToRequest(requestProps);
-        this.request = isPromise(request) ? request : null;
-        this.handleRequest();
+    componentDidUpdate(prevProps) {
+      const requestProps = getRequestProps(this.props);
+      if (!shallowEqual(getRequestProps(prevProps), requestProps)) {
+        this.request = mapPropsToRequest(requestProps);
+        if (isPromise(this.request)) {
+          this.handleRequest(this.request, requestProps);
+        }
       }
     }
 
@@ -83,20 +71,18 @@ function createRequest(initialValue, mapPropsToRequest) {
     request = null;
     hasUnmounted = false;
 
-    handleRequest = () => {
-      if (this.request === null) return;
-      const { requestId, requestProps: args } = this.state;
+    handleRequest = (request, args = getRequestProps(this.props)) => {
       this.setLoading(true);
-      this.request.then(
+      request.then(
         (data) => {
-          if (!this.hasUnmounted && this.state.requestId === requestId) {
+          if (!this.hasUnmounted && this.request === request) {
             this.setState({ args, data, isLoading: false, error: null }, () =>
               this.props.onFulfilled(data)
             );
           }
         },
         (error) => {
-          if (!this.hasUnmounted && this.state.requestid === requestId) {
+          if (!this.hasUnmounted && this.request === request) {
             this.setState({ args, isLoading: false, error }, () =>
               this.props.onRejected(error)
             );
@@ -106,16 +92,19 @@ function createRequest(initialValue, mapPropsToRequest) {
     };
 
     updateData = (nextArgs) => {
-      this.setState(({ requestId, requestProps }) => ({
-        requestId: requestId + 1,
-        requestProps: Object.assign({}, requestProps, nextArgs)
-      }));
+      const requestProps = Object.assign({}, this.state.requestProps, nextArgs);
+      if (!shallowEqual(this.props, requestProps)) {
+        this.request = mapPropsToRequest(requestProps);
+        if (isPromise(this.request)) {
+          this.handleRequest(this.request, requestProps);
+        }
+      }
     };
 
     render() {
       const { render, component, children } = this.props;
 
-      const renderProps = Object.assign({}, getRenderProps(this.state), {
+      const renderProps = Object.assign({}, this.state, {
         updateData: this.updateData
       });
 
@@ -124,9 +113,7 @@ function createRequest(initialValue, mapPropsToRequest) {
       if (typeof children === 'function') return children(renderProps);
       return null;
     }
-  }
-
-  return polyfill(RequestComponent);
+  };
 }
 
 export default createRequest;
