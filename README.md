@@ -52,4 +52,7 @@ class App extends React.Component {
 export default App;
 ```
 
-See on [codesanbox](https://codesandbox.io/s/72zwxl9p0)!
+See examples on codesanbox:
+
+  1. [Star Wars Search](https://codesandbox.io/s/72zwxl9p0)
+  2. [Star Wars Search (with updateData)](https://codesandbox.io/s/6v71pwkq7w)
