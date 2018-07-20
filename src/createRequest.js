@@ -59,7 +59,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     componentWillUnmount() {
-      this.hasUnmounted = true;
+      this.request = null;
     }
 
     setLoading = (value) => {
@@ -69,20 +69,19 @@ function createRequest(initialValue, mapPropsToRequest) {
     };
 
     request = null;
-    hasUnmounted = false;
 
     handleRequest = (request, args = getRequestProps(this.props)) => {
       this.setLoading(true);
       request.then(
         (data) => {
-          if (!this.hasUnmounted && this.request === request) {
+          if (this.request === request) {
             this.setState({ args, data, isLoading: false, error: null }, () =>
               this.props.onFulfilled(data)
             );
           }
         },
         (error) => {
-          if (!this.hasUnmounted && this.request === request) {
+          if (this.request === request) {
             this.setState({ args, isLoading: false, error }, () =>
               this.props.onRejected(error)
             );
