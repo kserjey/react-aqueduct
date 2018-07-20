@@ -139,3 +139,17 @@ test('refetch data on updateData', async () => {
     expect(getByTestId('request-result').textContent).toBe('data-2')
   );
 });
+
+test('should not handle response after component has been unmounted', (done) => {
+  console.error = jest.fn(console.error);
+  const callback = jest.fn();
+  const FakeRequest = createRequest('', () => fakeFetch('data'));
+  const { unmount } = render(
+    <FakeRequest onFulfilled={callback} component={RequestResult}/>
+  );
+  unmount();
+  setTimeout(() => {
+    expect(console.error).not.toHaveBeenCalled();
+    done();
+  }, 300);
+});
