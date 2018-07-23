@@ -91,7 +91,7 @@ function createRequest(initialValue, mapPropsToRequest) {
     };
 
     updateData = (nextArgs) => {
-      const requestProps = Object.assign({}, this.state.requestProps, nextArgs);
+      const requestProps = Object.assign({}, getRequestProps(this.props), nextArgs);
       if (!shallowEqual(this.props, requestProps)) {
         this.request = mapPropsToRequest(requestProps);
         if (isPromise(this.request)) {
