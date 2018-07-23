@@ -31,11 +31,10 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     constructor(props) {
       super(props);
-      const requestProps = getRequestProps(this.props);
-      const request = mapPropsToRequest(requestProps);
-      this.request = isPromise(request) ? request : null;
+      this.requestProps = getRequestProps(this.props);
+      this.request = mapPropsToRequest(this.requestProps);
       this.state = {
-        isLoading: this.request !== null,
+        isLoading: isPromise(this.request),
         args: {},
         data: props.initialValue,
         error: null
@@ -43,18 +42,13 @@ function createRequest(initialValue, mapPropsToRequest) {
     }
 
     componentDidMount() {
-      if (this.state.isLoading) {
-        this.handleRequest(this.request);
-      }
+      this.fetchData(this.requestProps, this.request);
     }
 
-    componentDidUpdate(prevProps) {
-      const requestProps = getRequestProps(this.props);
-      if (!shallowEqual(getRequestProps(prevProps), requestProps)) {
-        this.request = mapPropsToRequest(requestProps);
-        if (isPromise(this.request)) {
-          this.handleRequest(this.request, requestProps);
-        }
+    componentDidUpdate() {
+      const nextRequestProps = getRequestProps(this.props);
+      if (!shallowEqual(this.requestProps, nextRequestProps)) {
+        this.fetchData(nextRequestProps);
       }
     }
 
@@ -68,9 +62,13 @@ function createRequest(initialValue, mapPropsToRequest) {
       }
     };
 
+    requestProps = {};
     request = null;
 
-    handleRequest = (request, args = getRequestProps(this.props)) => {
+    fetchData = (args, request = mapPropsToRequest(args)) => {
+      if (!isPromise(request)) return;
+      this.requestProps = args;
+      this.request = request;
       this.setLoading(true);
       request.then(
         (data) => {
@@ -90,14 +88,8 @@ function createRequest(initialValue, mapPropsToRequest) {
       );
     };
 
-    updateData = (nextArgs) => {
-      const requestProps = Object.assign({}, getRequestProps(this.props), nextArgs);
-      if (!shallowEqual(this.props, requestProps)) {
-        this.request = mapPropsToRequest(requestProps);
-        if (isPromise(this.request)) {
-          this.handleRequest(this.request, requestProps);
-        }
-      }
+    updateData = (args) => {
+      this.fetchData(Object.assign({}, this.requestProps, args));
     };
 
     render() {
