@@ -1,23 +1,27 @@
 import React from 'react';
 import hoistNonReactStatics from 'hoist-non-react-statics';
-import isFunction from 'lodash/isFunction';
-import omitBy from 'lodash/omitBy';
+import isEqual from 'lodash/isEqual';
 import createRequest from './createRequest';
 import { getDisplayName } from './utils';
 
 const defaultOptions = {
-  mapPropsToValue: props => omitBy(props, isFunction),
+  shouldDataUpdate: (props, nextProps) => !isEqual(props, nextProps),
+  mapPropsToValue: () => undefined,
   mapPropsToRequest: () => null
 };
 
 function withRequest(options) {
-  const { mapPropsToValue, mapPropsToRequest } = Object.assign(
-    Object.create(null),
-    defaultOptions,
-    options
-  );
+  const {
+    mapPropsToValue,
+    mapPropsToRequest,
+    ...requestOptions
+  } = Object.assign({}, defaultOptions, options);
 
-  const RequestComponent = createRequest(null, mapPropsToRequest);
+  const RequestComponent = createRequest(
+    undefined,
+    mapPropsToRequest,
+    requestOptions
+  );
 
   return (Component) => {
     const componentDisplayName = getDisplayName(Component);
