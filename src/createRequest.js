@@ -20,7 +20,13 @@ const propTypes = {
 
 const getRequestProps = props => omit(props, Object.keys(propTypes));
 
-function createRequest(initialValue, mapPropsToRequest) {
+const defaultOptions = {
+  shouldDataUpdate: (props, nextProps) => !shallowEqual(props, nextProps)
+};
+
+function createRequest(initialValue, mapPropsToRequest, options) {
+  const { shouldDataUpdate } = Object.assign({}, defaultOptions, options);
+
   return class RequestComponent extends React.Component {
     static propTypes = propTypes;
     static defaultProps = {
@@ -47,7 +53,7 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     componentDidUpdate() {
       const nextRequestProps = getRequestProps(this.props);
-      if (!shallowEqual(this.requestProps, nextRequestProps)) {
+      if (shouldDataUpdate(this.requestProps, nextRequestProps)) {
         this.fetchData(nextRequestProps);
       }
     }
@@ -94,11 +100,7 @@ function createRequest(initialValue, mapPropsToRequest) {
 
     render() {
       const { render, component, children } = this.props;
-
-      const renderProps = Object.assign({}, this.state, {
-        updateData: this.updateData
-      });
-
+      const renderProps = { ...this.state, updateData: this.updateData };
       if (component) return React.createElement(component, renderProps);
       if (render) return render(renderProps);
       if (typeof children === 'function') return children(renderProps);

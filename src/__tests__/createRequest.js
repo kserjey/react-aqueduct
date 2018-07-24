@@ -116,6 +116,25 @@ test('do not refetch if props have not been changed', async () => {
   expect(getByTestId('request-result').textContent).toBe('data');
 });
 
+test('custom shouldDataUpdate', async () => {
+  const request = jest.fn(({ data }) => fakeFetch(data));
+  const FakeRequest = createRequest('', request, {
+    shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id
+  });
+
+  const { rerender, getByTestId } = render(
+    <FakeRequest id={1} data='first' component={RequestResult}/>
+  );
+
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('first')
+  );
+
+  rerender(<FakeRequest id={1} data='second' component={RequestResult}/>);
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(getByTestId('request-result').textContent).toBe('first');
+});
+
 test('refetch data on updateData', async () => {
   let callsCount = 0;
   const FakeRequest = createRequest('', () => {
@@ -142,11 +161,8 @@ test('refetch data on updateData', async () => {
 
 test('should not handle response after component has been unmounted', (done) => {
   console.error = jest.fn(console.error);
-  const callback = jest.fn();
   const FakeRequest = createRequest('', () => fakeFetch('data'));
-  const { unmount } = render(
-    <FakeRequest onFulfilled={callback} component={RequestResult}/>
-  );
+  const { unmount } = render(<FakeRequest component={RequestResult}/>);
   unmount();
   setTimeout(() => {
     expect(console.error).not.toHaveBeenCalled();
