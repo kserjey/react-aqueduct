@@ -21,11 +21,16 @@ const propTypes = {
 const getRequestProps = props => omit(props, Object.keys(propTypes));
 
 const defaultOptions = {
+  debounce: () => false,
   shouldDataUpdate: (props, nextProps) => !shallowEqual(props, nextProps),
 };
 
 function createRequest(initialValue, mapPropsToRequest, options) {
-  const { shouldDataUpdate } = Object.assign({}, defaultOptions, options);
+  const { debounce, shouldDataUpdate } = Object.assign(
+    {},
+    defaultOptions,
+    options,
+  );
 
   return class RequestComponent extends React.Component {
     static propTypes = propTypes;
@@ -38,6 +43,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
     constructor(props) {
       super(props);
+      this.timeout = null;
       this.requestProps = getRequestProps(props);
       this.request = mapPropsToRequest(this.requestProps);
       this.state = {
@@ -55,12 +61,21 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     componentDidUpdate() {
       const nextRequestProps = getRequestProps(this.props);
       if (shouldDataUpdate(this.requestProps, nextRequestProps)) {
-        this.fetchData(nextRequestProps);
+        const wait = debounce(this.requestProps, nextRequestProps);
+        if (Number.isInteger(wait) && wait > 0) {
+          clearTimeout(this.timeout);
+          this.timeout = setTimeout(() => {
+            this.fetchData(nextRequestProps);
+          }, wait);
+        } else {
+          this.fetchData(nextRequestProps);
+        }
       }
     }
 
     componentWillUnmount() {
       this.request = null;
+      clearTimeout(this.timeout);
     }
 
     setLoading = (value) => {
@@ -71,6 +86,12 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
     fetchData = (args, request = mapPropsToRequest(args)) => {
       if (!isPromise(request)) return;
+
+      if (this.timeout !== null) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+
       this.requestProps = args;
       this.request = request;
       this.setLoading(true);

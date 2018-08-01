@@ -129,6 +129,28 @@ test('custom shouldDataUpdate', async () => {
   expect(getByTestId('request-result').textContent).toBe('first');
 });
 
+test('debounce', async () => {
+  const request = jest.fn(({ id, query }) => fakeFetch(`${id}-${query}`));
+  const FakeRequest = createRequest('', request, {
+    debounce: (props, nextProps) => {
+      if (props.query !== nextProps.query) return 500;
+      return false;
+    },
+  });
+
+  const { rerender, getByTestId } = render(
+    <FakeRequest id={1} query='' component={RequestResult}/>,
+  );
+
+  rerender(<FakeRequest id={1} query='q' component={RequestResult}/>);
+  rerender(<FakeRequest id={1} query='que' component={RequestResult}/>);
+  rerender(<FakeRequest id={1} query='query' component={RequestResult}/>);
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('1-query'),
+  );
+  expect(request).toHaveBeenCalledTimes(2);
+});
+
 test('refetch data on updateData', async () => {
   let callsCount = 0;
   const FakeRequest = createRequest('', () => {
