@@ -9,6 +9,7 @@
     "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
     "jsx-quotes": ["error", "prefer-single"],
     "comma-dangle": "error",
+    "react/destructuring-assignment": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".js"] }],
     "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "never" }],
     "react/require-default-props": "off",

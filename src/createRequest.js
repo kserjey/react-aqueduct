@@ -29,6 +29,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
   return class RequestComponent extends React.Component {
     static propTypes = propTypes;
+
     static defaultProps = {
       initialValue,
       onFulfilled: () => {},
@@ -37,7 +38,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
     constructor(props) {
       super(props);
-      this.requestProps = getRequestProps(this.props);
+      this.requestProps = getRequestProps(props);
       this.request = mapPropsToRequest(this.requestProps);
       this.state = {
         isLoading: isPromise(this.request),
@@ -63,13 +64,10 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     }
 
     setLoading = (value) => {
-      if (this.state.isLoading !== value) {
-        this.setState({ isLoading: value });
-      }
+      this.setState(
+        ({ isLoading }) => (isLoading === value ? null : { isLoading: value }),
+      );
     };
-
-    requestProps = {};
-    request = null;
 
     fetchData = (args, request = mapPropsToRequest(args)) => {
       if (!isPromise(request)) return;

@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable no-console, react/prop-types */
 import React from 'react';
 import { render, wait, fireEvent, cleanup } from 'react-testing-library';
 import createRequest from '../createRequest';
@@ -15,7 +15,9 @@ function RequestResult({ isLoading, data, updateData }) {
   return (
     <div>
       <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-      <button onClick={() => updateData()}>update</button>
+      <button type='button' onClick={() => updateData()}>
+        update
+      </button>
     </div>
   );
 }
