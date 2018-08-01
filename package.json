@@ -14,9 +14,15 @@
   "scripts": {
     "lint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
-    "test": "jest --testURL=http://localhost",
+    "test": "jest",
     "build": "rollup -c",
     "prepare": "npm run build"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.test.js"
+    ],
+    "testURL": "http://localhost"
   },
   "husky": {
     "hooks": {

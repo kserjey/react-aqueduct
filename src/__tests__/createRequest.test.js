@@ -1,15 +1,7 @@
-/* eslint-disable no-console, react/prop-types */
 import React from 'react';
 import { render, wait, fireEvent, cleanup } from 'react-testing-library';
 import createRequest from '../createRequest';
-
-const defaultRequest = { delay: 100, error: false };
-function fakeFetch(data, options) {
-  const { delay, error } = Object.assign({}, defaultRequest, options);
-  return new Promise((resolve, reject) => {
-    setTimeout(error ? reject : resolve, delay, data);
-  });
-}
+import { fakeFetch } from './utils';
 
 function RequestResult({ isLoading, data, updateData }) {
   return (
