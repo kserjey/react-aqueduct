@@ -7,7 +7,7 @@ import { getDisplayName } from './utils';
 const defaultOptions = {
   shouldDataUpdate: (props, nextProps) => !isEqual(props, nextProps),
   mapPropsToValue: () => undefined,
-  mapPropsToRequest: () => null
+  mapPropsToRequest: () => null,
 };
 
 function withRequest(options) {
@@ -20,7 +20,7 @@ function withRequest(options) {
   const RequestComponent = createRequest(
     undefined,
     mapPropsToRequest,
-    requestOptions
+    requestOptions,
   );
 
   return (Component) => {

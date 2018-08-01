@@ -6,14 +6,14 @@ export default {
   input: 'src/index.js',
   output: {
     file: pkg.main,
-    format: 'cjs'
+    format: 'cjs',
   },
   plugins: [
     babel({
       exclude: 'node_modules/**',
-      plugins: ['external-helpers']
+      plugins: ['external-helpers'],
     }),
-    filesize()
+    filesize(),
   ],
-  external: ['react', ...Object.keys(pkg.dependencies)]
+  external: ['react', ...Object.keys(pkg.dependencies)],
 };

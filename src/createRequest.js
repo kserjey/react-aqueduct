@@ -9,19 +9,19 @@ const propTypes = {
     PropTypes.number,
     PropTypes.string,
     PropTypes.array,
-    PropTypes.object
+    PropTypes.object,
   ]),
   component: PropTypes.func,
   render: PropTypes.func,
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   onFulfilled: PropTypes.func,
-  onRejected: PropTypes.func
+  onRejected: PropTypes.func,
 };
 
 const getRequestProps = props => omit(props, Object.keys(propTypes));
 
 const defaultOptions = {
-  shouldDataUpdate: (props, nextProps) => !shallowEqual(props, nextProps)
+  shouldDataUpdate: (props, nextProps) => !shallowEqual(props, nextProps),
 };
 
 function createRequest(initialValue, mapPropsToRequest, options) {
@@ -32,7 +32,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     static defaultProps = {
       initialValue,
       onFulfilled: () => {},
-      onRejected: () => {}
+      onRejected: () => {},
     };
 
     constructor(props) {
@@ -43,7 +43,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
         isLoading: isPromise(this.request),
         args: {},
         data: props.initialValue,
-        error: null
+        error: null,
       };
     }
 
@@ -80,17 +80,17 @@ function createRequest(initialValue, mapPropsToRequest, options) {
         (data) => {
           if (this.request === request) {
             this.setState({ args, data, isLoading: false, error: null }, () =>
-              this.props.onFulfilled(data)
+              this.props.onFulfilled(data),
             );
           }
         },
         (error) => {
           if (this.request === request) {
             this.setState({ args, isLoading: false, error }, () =>
-              this.props.onRejected(error)
+              this.props.onRejected(error),
             );
           }
-        }
+        },
       );
     };
 

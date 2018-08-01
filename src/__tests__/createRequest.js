@@ -32,7 +32,7 @@ test('make request', async () => {
   expect(request).toHaveBeenCalledTimes(1);
   expect(getByTestId('request-result').textContent).toBe('loading');
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('data')
+    expect(getByTestId('request-result').textContent).toBe('data'),
   );
 });
 
@@ -48,7 +48,7 @@ test('call onFulfilled on success response', (done) => {
 
 test('call onRejected on failed response', (done) => {
   const FakeRequest = createRequest('', () =>
-    fakeFetch('error', { error: true })
+    fakeFetch('error', { error: true }),
   );
 
   const callback = (error) => {
@@ -65,7 +65,7 @@ test('pass used args', async () => {
     <FakeRequest
       data='data'
       render={({ args }) => <div data-testid='argument'>{args.data}</div>}
-    />
+    />,
   );
 
   expect(getByTestId('argument').textContent).toBe('');
@@ -85,17 +85,17 @@ test('refetch data on update props', async () => {
   const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
 
   const { rerender, getByTestId } = render(
-    <FakeRequest data='first' component={RequestResult}/>
+    <FakeRequest data='first' component={RequestResult}/>,
   );
 
   expect(getByTestId('request-result').textContent).toBe('loading');
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('first')
+    expect(getByTestId('request-result').textContent).toBe('first'),
   );
 
   rerender(<FakeRequest data='second' component={RequestResult}/>);
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('second')
+    expect(getByTestId('request-result').textContent).toBe('second'),
   );
 });
 
@@ -104,11 +104,11 @@ test('do not refetch if props have not been changed', async () => {
   const FakeRequest = createRequest('', request);
 
   const { rerender, getByTestId } = render(
-    <FakeRequest data='first' component={RequestResult}/>
+    <FakeRequest data='first' component={RequestResult}/>,
   );
 
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('data')
+    expect(getByTestId('request-result').textContent).toBe('data'),
   );
 
   rerender(<FakeRequest data='first' component={RequestResult}/>);
@@ -119,15 +119,15 @@ test('do not refetch if props have not been changed', async () => {
 test('custom shouldDataUpdate', async () => {
   const request = jest.fn(({ data }) => fakeFetch(data));
   const FakeRequest = createRequest('', request, {
-    shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id
+    shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
   });
 
   const { rerender, getByTestId } = render(
-    <FakeRequest id={1} data='first' component={RequestResult}/>
+    <FakeRequest id={1} data='first' component={RequestResult}/>,
   );
 
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('first')
+    expect(getByTestId('request-result').textContent).toBe('first'),
   );
 
   rerender(<FakeRequest id={1} data='second' component={RequestResult}/>);
@@ -143,11 +143,11 @@ test('refetch data on updateData', async () => {
   });
 
   const { getByTestId, getByText } = render(
-    <FakeRequest component={RequestResult}/>
+    <FakeRequest component={RequestResult}/>,
   );
 
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('data-1')
+    expect(getByTestId('request-result').textContent).toBe('data-1'),
   );
 
   fireEvent.click(getByText('update'));
@@ -155,7 +155,7 @@ test('refetch data on updateData', async () => {
   expect(callsCount).toBe(2);
   expect(getByTestId('request-result').textContent).toBe('loading');
   await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('data-2')
+    expect(getByTestId('request-result').textContent).toBe('data-2'),
   );
 });
 

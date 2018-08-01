@@ -17,7 +17,7 @@ import { createRequest } from 'react-aqueduct';
 const PeopleSearch = createRequest([], ({ name }) =>
   fetch(`https://swapi.co/api/people/?search=${name}`)
     .then(response => response.json())
-    .then(json => json.results)
+    .then(json => json.results),
 );
 
 const renderItem = item => <li>{item.name}</li>;
@@ -34,7 +34,7 @@ class App extends React.Component {
       <section>
         <h1>Start Wars Search</h1>
         <input
-          placeholder='Yoda'
+          placeholder="Yoda"
           value={this.state.name}
           onChange={this.handleChange}
         />
@@ -54,5 +54,5 @@ export default App;
 
 See examples on codesanbox:
 
-  1. [Star Wars Search](https://codesandbox.io/s/72zwxl9p0)
-  2. [Star Wars Search (with updateData)](https://codesandbox.io/s/6v71pwkq7w)
+1.  [Star Wars Search](https://codesandbox.io/s/72zwxl9p0)
+2.  [Star Wars Search (with updateData)](https://codesandbox.io/s/6v71pwkq7w)
