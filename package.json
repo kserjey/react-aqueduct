@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
-    "test": "jest",
+    "test": "jest --testURL=http://localhost",
     "build": "rollup -c",
     "prepare": "npm run build"
   },
