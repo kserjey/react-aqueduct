@@ -1,11 +1,10 @@
 import React from 'react';
 import hoistNonReactStatics from 'hoist-non-react-statics';
-import isEqual from 'lodash/isEqual';
 import createRequest from './createRequest';
 import { getDisplayName } from './utils';
 
 const defaultOptions = {
-  shouldDataUpdate: (props, nextProps) => !isEqual(props, nextProps),
+  shouldDataUpdate: () => false,
   mapPropsToValue: () => undefined,
   mapPropsToRequest: () => null,
 };
