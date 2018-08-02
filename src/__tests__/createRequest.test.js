@@ -175,6 +175,34 @@ test('refetch data on updateData', async () => {
   );
 });
 
+test('refetch data on updateData with new args', async () => {
+  const request = jest.fn(({ data }) => fakeFetch(data));
+  const FakeRequest = createRequest('', request);
+  const { getByTestId, getByText } = render(
+    <FakeRequest
+      data='props'
+      render={({ isLoading, data, updateData }) => (
+        <div>
+          <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
+          <button type='button' onClick={() => updateData({ data: 'inner' })}>
+            update
+          </button>
+        </div>
+      )}
+    />,
+  );
+
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('props'),
+  );
+
+  fireEvent.click(getByText('update'));
+
+  await wait(() => {
+    expect(getByTestId('request-result').textContent).toBe('inner');
+  });
+});
+
 test('should not handle response after component has been unmounted', (done) => {
   console.error = jest.fn(console.error);
   const FakeRequest = createRequest('', () => fakeFetch('data'));

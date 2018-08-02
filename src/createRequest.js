@@ -65,9 +65,11 @@ function createRequest(initialValue, mapPropsToRequest, options) {
         if (Number.isInteger(wait) && wait > 0) {
           clearTimeout(this.timeout);
           this.timeout = setTimeout(() => {
+            this.requestProps = nextRequestProps;
             this.fetchData(nextRequestProps);
           }, wait);
         } else {
+          this.requestProps = nextRequestProps;
           this.fetchData(nextRequestProps);
         }
       }
@@ -92,7 +94,6 @@ function createRequest(initialValue, mapPropsToRequest, options) {
         this.timeout = null;
       }
 
-      this.requestProps = args;
       this.request = request;
       this.setLoading(true);
       request.then(
