@@ -2,7 +2,7 @@ import babel from 'rollup-plugin-babel';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import pkg from './package.json';
 
-const EXTERNAL = ['react', '@babel/runtime', ...Object.keys(pkg.dependencies)];
+const EXTERNAL = ['react', ...Object.keys(pkg.dependencies)];
 
 export default {
   input: 'src/index.js',
