@@ -18,7 +18,7 @@ afterEach(cleanup);
 
 test('make a request', async () => {
   const mapPropsToRequest = jest.fn(({ id }) => fakeFetch(`${id}-data`));
-  const FakeComponent = withRequest({ mapPropsToRequest })(RequestResult);
+  const FakeComponent = withRequest(mapPropsToRequest)(RequestResult);
 
   const { getByTestId } = render(<FakeComponent id={5}/>);
   expect(mapPropsToRequest).toHaveBeenCalled();
@@ -30,16 +30,17 @@ test('make a request', async () => {
 });
 
 test('make request if shouldDataUpdate returns true', () => {
-  const options = {
-    mapPropsToRequest: jest.fn(({ id, title }) => fakeFetch(`${id}-${title}`)),
-    shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
-  };
+  const mapPropsToRequest = jest.fn(({ id, title }) =>
+    fakeFetch(`${id}-${title}`),
+  );
 
-  const FakeComponent = withRequest(options)(RequestResult);
+  const FakeComponent = withRequest(mapPropsToRequest, {
+    shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
+  })(RequestResult);
 
   const { rerender } = render(<FakeComponent id={5} title='first'/>);
   rerender(<FakeComponent id={5} title='second'/>);
-  expect(options.mapPropsToRequest).toHaveBeenCalledTimes(1);
+  expect(mapPropsToRequest).toHaveBeenCalledTimes(1);
   rerender(<FakeComponent id={6} title='second'/>);
-  expect(options.mapPropsToRequest).toHaveBeenCalledTimes(2);
+  expect(mapPropsToRequest).toHaveBeenCalledTimes(2);
 });

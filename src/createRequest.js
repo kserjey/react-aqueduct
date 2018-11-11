@@ -4,13 +4,6 @@ import omit from 'lodash/omit';
 import { shallowEqual, isPromise } from './utils';
 
 const propTypes = {
-  initialValue: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.number,
-    PropTypes.string,
-    PropTypes.array,
-    PropTypes.object,
-  ]),
   component: PropTypes.func,
   render: PropTypes.func,
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
@@ -36,7 +29,6 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     static propTypes = propTypes;
 
     static defaultProps = {
-      initialValue,
       onFulfilled: () => {},
       onRejected: () => {},
     };
@@ -49,7 +41,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
       this.state = {
         isLoading: isPromise(this.request),
         args: {},
-        data: props.initialValue,
+        data: initialValue,
         error: null,
       };
     }
@@ -81,8 +73,8 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     }
 
     setLoading = (value) => {
-      this.setState(
-        ({ isLoading }) => (isLoading === value ? null : { isLoading: value }),
+      this.setState(({ isLoading }) =>
+        isLoading === value ? null : { isLoading: value },
       );
     };
 

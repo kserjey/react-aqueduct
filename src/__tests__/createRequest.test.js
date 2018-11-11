@@ -30,6 +30,14 @@ test('make a request', async () => {
   );
 });
 
+test('set initialValue', async () => {
+  const FakeRequest = createRequest('initial', () => fakeFetch('data'));
+  const { container } = render(
+    <FakeRequest render={({ data }) => <div>{data}</div>}/>,
+  );
+  expect(container.firstChild.textContent).toBe('initial');
+});
+
 test('call onFulfilled when a request completes successfully', (done) => {
   const FakeRequest = createRequest('', () => fakeFetch('data'));
   const callback = (data) => {
