@@ -16,7 +16,7 @@ function RequestResult({ isLoading, data, updateData }) {
 
 afterEach(cleanup);
 
-test('make request', async () => {
+test('make a request', async () => {
   const request = jest.fn(() => fakeFetch('data'));
   const FakeRequest = createRequest('', request);
 
@@ -30,7 +30,7 @@ test('make request', async () => {
   );
 });
 
-test('call onFulfilled on success response', (done) => {
+test('call onFulfilled when a request completes successfully', (done) => {
   const FakeRequest = createRequest('', () => fakeFetch('data'));
   const callback = (data) => {
     expect(data).toBe('data');
@@ -40,7 +40,7 @@ test('call onFulfilled on success response', (done) => {
   render(<FakeRequest onFulfilled={callback}/>);
 });
 
-test('call onRejected on failed response', (done) => {
+test('call onRejected when a request fails', (done) => {
   const FakeRequest = createRequest('', () =>
     fakeFetch('error', { error: true }),
   );
@@ -53,20 +53,7 @@ test('call onRejected on failed response', (done) => {
   render(<FakeRequest onRejected={callback}/>);
 });
 
-test('pass used args', async () => {
-  const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
-  const { getByTestId } = render(
-    <FakeRequest
-      data='data'
-      render={({ args }) => <div data-testid='argument'>{args.data}</div>}
-    />,
-  );
-
-  expect(getByTestId('argument').textContent).toBe('');
-  await wait(() => expect(getByTestId('argument').textContent).toBe('data'));
-});
-
-test('do not make request if not a promise', () => {
+test('do not make a reqeust if not a promise', () => {
   const request = jest.fn(() => null);
   const FakeRequest = createRequest('initial', request);
 
@@ -75,7 +62,24 @@ test('do not make request if not a promise', () => {
   expect(getByTestId('request-result').textContent).toBe('initial');
 });
 
-test('refetch data on update props', async () => {
+test('do nothing if props have not been changed', async () => {
+  const request = jest.fn(() => fakeFetch('data'));
+  const FakeRequest = createRequest('', request);
+
+  const { rerender, getByTestId } = render(
+    <FakeRequest data='first' component={RequestResult}/>,
+  );
+
+  await wait(() =>
+    expect(getByTestId('request-result').textContent).toBe('data'),
+  );
+
+  rerender(<FakeRequest data='first' component={RequestResult}/>);
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(getByTestId('request-result').textContent).toBe('data');
+});
+
+test('refetch data when props have changed', async () => {
   const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
 
   const { rerender, getByTestId } = render(
@@ -93,24 +97,7 @@ test('refetch data on update props', async () => {
   );
 });
 
-test('do not refetch if props have not been changed', async () => {
-  const request = jest.fn(() => fakeFetch('data'));
-  const FakeRequest = createRequest('', request);
-
-  const { rerender, getByTestId } = render(
-    <FakeRequest data='first' component={RequestResult}/>,
-  );
-
-  await wait(() =>
-    expect(getByTestId('request-result').textContent).toBe('data'),
-  );
-
-  rerender(<FakeRequest data='first' component={RequestResult}/>);
-  expect(request).toHaveBeenCalledTimes(1);
-  expect(getByTestId('request-result').textContent).toBe('data');
-});
-
-test('custom shouldDataUpdate', async () => {
+test('refetch data only if shouldDataUpdate returns true', async () => {
   const request = jest.fn(({ data }) => fakeFetch(data));
   const FakeRequest = createRequest('', request, {
     shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
@@ -151,7 +138,20 @@ test('debounce', async () => {
   expect(request).toHaveBeenCalledTimes(2);
 });
 
-test('refetch data on updateData', async () => {
+test('pass used args', async () => {
+  const FakeRequest = createRequest('', ({ data }) => fakeFetch(data));
+  const { getByTestId } = render(
+    <FakeRequest
+      data='data'
+      render={({ args }) => <div data-testid='argument'>{args.data}</div>}
+    />,
+  );
+
+  expect(getByTestId('argument').textContent).toBe('');
+  await wait(() => expect(getByTestId('argument').textContent).toBe('data'));
+});
+
+test('refetch data when updateData is called', async () => {
   let callsCount = 0;
   const FakeRequest = createRequest('', () => {
     callsCount += 1;
@@ -175,7 +175,7 @@ test('refetch data on updateData', async () => {
   );
 });
 
-test('refetch data on updateData with new args', async () => {
+test('refetch data when updateData is called with new args', async () => {
   const request = jest.fn(({ data }) => fakeFetch(data));
   const FakeRequest = createRequest('', request);
   const { getByTestId, getByText } = render(
@@ -203,7 +203,7 @@ test('refetch data on updateData with new args', async () => {
   });
 });
 
-test('should not handle response after component has been unmounted', (done) => {
+test('do not handle response after component has been unmounted', (done) => {
   console.error = jest.fn(console.error);
   const FakeRequest = createRequest('', () => fakeFetch('data'));
   const { unmount } = render(<FakeRequest component={RequestResult}/>);

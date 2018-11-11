@@ -16,7 +16,7 @@ function RequestResult({ isLoading, data, updateData }) {
 
 afterEach(cleanup);
 
-test('should make request on mount', async () => {
+test('make a request', async () => {
   const mapPropsToRequest = jest.fn(({ id }) => fakeFetch(`${id}-data`));
   const FakeComponent = withRequest({ mapPropsToRequest })(RequestResult);
 
@@ -29,7 +29,7 @@ test('should make request on mount', async () => {
   );
 });
 
-test('should make request if shouldDataUpdate returns true', () => {
+test('make request if shouldDataUpdate returns true', () => {
   const options = {
     mapPropsToRequest: jest.fn(({ id, title }) => fakeFetch(`${id}-${title}`)),
     shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
