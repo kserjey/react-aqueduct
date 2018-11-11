@@ -14,12 +14,7 @@ export default {
     babel({
       exclude: '**/node_modules/**',
       runtimeHelpers: true,
-      plugins: [
-        [
-          '@babel/plugin-transform-runtime',
-          { polyfill: false, useBuiltIns: true },
-        ],
-      ],
+      plugins: [['@babel/transform-runtime']],
     }),
     sizeSnapshot(),
   ],
