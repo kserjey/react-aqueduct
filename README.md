@@ -52,7 +52,39 @@ class App extends React.Component {
 export default App;
 ```
 
-See examples on codesanbox:
+See more examples on codesanbox:
 
 1.  [Star Wars Search](https://codesandbox.io/s/72zwxl9p0)
 2.  [Star Wars Search (with updateData)](https://codesandbox.io/s/6v71pwkq7w)
+
+## API
+
+### createRequest()
+
+```js
+createRequest(
+  initialValue: any,
+  mapPropsToRequest: (props: Object) => Promise,
+  options: Object,
+)
+```
+
+Function that creates _request component_ - a component which fetches data and pass it via render props.
+
+**`initialValue`**
+
+Sets initial value of `data` before fetching is completed.
+
+**`mapPropsToRequest`**
+
+A function that takes component props and return request `Promise`. For example you can use `axios`:
+
+```js
+({ id }) => axios.get(`/api/users/${id}`);
+```
+
+**`options`**
+
+### withRequest()
+
+Hight order component
