@@ -32,7 +32,7 @@ class App extends React.Component {
   render() {
     return (
       <section>
-        <h1>Start Wars Search</h1>
+        <h1>Star Wars Search</h1>
         <input
           placeholder="Yoda"
           value={this.state.name}
@@ -63,10 +63,10 @@ See more examples on codesanbox:
 
 ```js
 createRequest(
-  initialValue: any,
-  mapPropsToRequest: (props: Object) => Promise,
-  options: Object,
-)
+  (initialValue: any),
+  (mapPropsToRequest: (props: Object) => Promise),
+  (options: Object),
+);
 ```
 
 Function that creates _request component_ - a component which fetches data and pass it via render props.
