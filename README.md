@@ -87,4 +87,4 @@ A function that takes component props and return request `Promise`. For example 
 
 ### withRequest()
 
-Hight order component
+Higher-order component
