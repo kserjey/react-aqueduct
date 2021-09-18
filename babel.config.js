@@ -1,10 +1,10 @@
 module.exports = {
   presets: [
     [
-      '@babel/env',
+      '@babel/preset-env',
       { modules: process.env.NODE_ENV === 'test' ? 'commonjs' : false },
     ],
-    '@babel/react',
+    '@babel/preset-react',
   ],
-  plugins: ['@babel/proposal-class-properties'],
+  plugins: ['@babel/plugin-transform-runtime'],
 };

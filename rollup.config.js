@@ -1,4 +1,4 @@
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import pkg from './package.json';
 
@@ -12,9 +12,8 @@ export default {
   },
   plugins: [
     babel({
-      exclude: '**/node_modules/**',
-      runtimeHelpers: true,
-      plugins: ['@babel/transform-runtime'],
+      exclude: 'node_modules/**',
+      babelHelpers: 'runtime',
     }),
     sizeSnapshot(),
   ],
