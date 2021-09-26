@@ -11,7 +11,7 @@ const propTypes = {
   onRejected: PropTypes.func,
 };
 
-const getRequestProps = props => omit(props, Object.keys(propTypes));
+const getRequestProps = (props) => omit(props, Object.keys(propTypes));
 
 const defaultOptions = {
   debounce: () => false,
@@ -19,20 +19,12 @@ const defaultOptions = {
 };
 
 function createRequest(initialValue, mapPropsToRequest, options) {
-  const { debounce, shouldDataUpdate } = Object.assign(
-    {},
-    defaultOptions,
-    options,
-  );
+  const { debounce, shouldDataUpdate } = {
+    ...defaultOptions,
+    ...options,
+  };
 
-  return class RequestComponent extends React.Component {
-    static propTypes = propTypes;
-
-    static defaultProps = {
-      onFulfilled: () => {},
-      onRejected: () => {},
-    };
-
+  class RequestComponent extends React.Component {
     constructor(props) {
       super(props);
       this.timeout = null;
@@ -116,6 +108,12 @@ function createRequest(initialValue, mapPropsToRequest, options) {
       if (typeof children === 'function') return children(renderProps);
       return null;
     }
+  }
+
+  RequestComponent.propTypes = propTypes;
+  RequestComponent.defaultProps = {
+    onFulfilled: () => {},
+    onRejected: () => {},
   };
 }
 

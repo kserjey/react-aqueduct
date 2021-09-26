@@ -10,18 +10,15 @@ const defaultOptions = {
 };
 
 function withRequest(mapPropsToRequest, options) {
-  const { initialValue, ...requestOptions } = Object.assign(
-    {},
-    defaultOptions,
-    options,
-  );
+  const { initialValue, ...requestOptions } = {
+    ...defaultOptions,
+    ...options,
+  };
 
   return (Component) => {
     const componentDisplayName = getDisplayName(Component);
 
     class RequestHOC extends React.Component {
-      static displayName = `withRequest(${componentDisplayName})`;
-
       constructor(props) {
         super(props);
         this.RequestComponent = createRequest(
@@ -31,17 +28,20 @@ function withRequest(mapPropsToRequest, options) {
         );
       }
 
-      renderRequest = requestProps => (
-        <Component {...this.props} {...requestProps}/>
+      renderRequest = (requestProps) => (
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        <Component {...this.props} {...requestProps} />
       );
 
       render() {
         return (
-          <this.RequestComponent {...this.props} render={this.renderRequest}/>
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          <this.RequestComponent {...this.props} render={this.renderRequest} />
         );
       }
     }
 
+    RequestHOC.displayName = `withRequest(${componentDisplayName})`;
     return hoistNonReactStatics(RequestHOC, Component);
   };
 }

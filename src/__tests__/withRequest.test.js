@@ -6,8 +6,8 @@ import { fakeFetch } from './utils';
 function RequestResult({ isLoading, data, updateData }) {
   return (
     <div>
-      <div data-testid='request-result'>{isLoading ? 'loading' : data}</div>
-      <button type='button' onClick={() => updateData()}>
+      <div data-testid="request-result">{isLoading ? 'loading' : data}</div>
+      <button type="button" onClick={() => updateData()}>
         update
       </button>
     </div>
@@ -20,7 +20,7 @@ test('make a request', async () => {
   const mapPropsToRequest = jest.fn(({ id }) => fakeFetch(`${id}-data`));
   const FakeComponent = withRequest(mapPropsToRequest)(RequestResult);
 
-  const { getByTestId } = render(<FakeComponent id={5}/>);
+  const { getByTestId } = render(<FakeComponent id={5} />);
   expect(mapPropsToRequest).toHaveBeenCalled();
   expect(mapPropsToRequest).toHaveBeenCalledTimes(1);
   expect(getByTestId('request-result').textContent).toBe('loading');
@@ -38,9 +38,9 @@ test('make request if shouldDataUpdate returns true', () => {
     shouldDataUpdate: (props, nextProps) => props.id !== nextProps.id,
   })(RequestResult);
 
-  const { rerender } = render(<FakeComponent id={5} title='first'/>);
-  rerender(<FakeComponent id={5} title='second'/>);
+  const { rerender } = render(<FakeComponent id={5} title="first" />);
+  rerender(<FakeComponent id={5} title="second" />);
   expect(mapPropsToRequest).toHaveBeenCalledTimes(1);
-  rerender(<FakeComponent id={6} title='second'/>);
+  rerender(<FakeComponent id={6} title="second" />);
   expect(mapPropsToRequest).toHaveBeenCalledTimes(2);
 });
