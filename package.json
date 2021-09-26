@@ -15,7 +15,7 @@
     "lint": "eslint src",
     "test": "jest",
     "build": "rollup -c",
-    "prepare": "npm run build"
+    "prepare": "npm run build && husky install"
   },
   "jest": {
     "testMatch": [
@@ -23,21 +23,9 @@
     ],
     "testURL": "http://localhost"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "eslint --fix",
-      "git add"
-    ],
-    "*.{json,md}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.js": "eslint --fix",
+    "*.{json,md}": "prettier --write"
   },
   "peerDependencies": {
     "react": ">=16"
@@ -58,9 +46,9 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.25.2",
-    "husky": "^1.3.1",
+    "husky": "^7.0.2",
     "jest": "^23.6.0",
-    "lint-staged": "^8.1.0",
+    "lint-staged": "^11.1.2",
     "prettier": "^2.4.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
