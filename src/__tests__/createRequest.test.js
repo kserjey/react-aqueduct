@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, wait, fireEvent, cleanup } from 'react-testing-library';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import createRequest from '../createRequest';
 import { fakeFetch } from './utils';
 
@@ -14,8 +14,6 @@ function RequestResult({ isLoading, data, updateData }) {
   );
 }
 
-afterEach(cleanup);
-
 test('make a request', async () => {
   const request = jest.fn(() => fakeFetch('data'));
   const FakeRequest = createRequest('', request);
@@ -25,7 +23,7 @@ test('make a request', async () => {
   expect(request).toHaveBeenCalled();
   expect(request).toHaveBeenCalledTimes(1);
   expect(getByTestId('request-result').textContent).toBe('loading');
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('data'),
   );
 });
@@ -78,7 +76,7 @@ test('do nothing if props have not been changed', async () => {
     <FakeRequest data="first" component={RequestResult} />,
   );
 
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('data'),
   );
 
@@ -95,12 +93,12 @@ test('refetch data when props have changed', async () => {
   );
 
   expect(getByTestId('request-result').textContent).toBe('loading');
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('first'),
   );
 
   rerender(<FakeRequest data="second" component={RequestResult} />);
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('second'),
   );
 });
@@ -115,7 +113,7 @@ test('refetch data only if shouldDataUpdate returns true', async () => {
     <FakeRequest id={1} data="first" component={RequestResult} />,
   );
 
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('first'),
   );
 
@@ -140,7 +138,7 @@ test('debounce', async () => {
   rerender(<FakeRequest id={1} query="q" component={RequestResult} />);
   rerender(<FakeRequest id={1} query="que" component={RequestResult} />);
   rerender(<FakeRequest id={1} query="query" component={RequestResult} />);
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('1-query'),
   );
   expect(request).toHaveBeenCalledTimes(2);
@@ -156,7 +154,7 @@ test('pass used args', async () => {
   );
 
   expect(getByTestId('argument').textContent).toBe('');
-  await wait(() => expect(getByTestId('argument').textContent).toBe('data'));
+  await waitFor(() => expect(getByTestId('argument').textContent).toBe('data'));
 });
 
 test('refetch data when updateData is called', async () => {
@@ -170,7 +168,7 @@ test('refetch data when updateData is called', async () => {
     <FakeRequest component={RequestResult} />,
   );
 
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('data-1'),
   );
 
@@ -178,7 +176,7 @@ test('refetch data when updateData is called', async () => {
 
   expect(callsCount).toBe(2);
   expect(getByTestId('request-result').textContent).toBe('loading');
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('data-2'),
   );
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, wait, cleanup } from 'react-testing-library';
+import { render, waitFor } from '@testing-library/react';
 import withRequest from '../withRequest';
 import { fakeFetch } from './utils';
 
@@ -14,8 +14,6 @@ function RequestResult({ isLoading, data, updateData }) {
   );
 }
 
-afterEach(cleanup);
-
 test('make a request', async () => {
   const mapPropsToRequest = jest.fn(({ id }) => fakeFetch(`${id}-data`));
   const FakeComponent = withRequest(mapPropsToRequest)(RequestResult);
@@ -24,7 +22,7 @@ test('make a request', async () => {
   expect(mapPropsToRequest).toHaveBeenCalled();
   expect(mapPropsToRequest).toHaveBeenCalledTimes(1);
   expect(getByTestId('request-result').textContent).toBe('loading');
-  await wait(() =>
+  await waitFor(() =>
     expect(getByTestId('request-result').textContent).toBe('5-data'),
   );
 });
