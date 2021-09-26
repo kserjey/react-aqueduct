@@ -115,6 +115,8 @@ function createRequest(initialValue, mapPropsToRequest, options) {
     onFulfilled: () => {},
     onRejected: () => {},
   };
+
+  return RequestComponent;
 }
 
 export default createRequest;
