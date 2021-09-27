@@ -1,12 +1,7 @@
 {
-  "lib/react-aqueduct.js": {
-    "bundled": 8703,
-    "minified": 5047,
-    "gzipped": 1542
-  },
   "react-aqueduct.js": {
-    "bundled": 12746,
-    "minified": 7951,
-    "gzipped": 2061
+    "bundled": 13861,
+    "minified": 8519,
+    "gzipped": 2042
   }
 }
