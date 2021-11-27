@@ -1,6 +1,9 @@
 import isFunction from 'lodash/isFunction';
 
-export function shallowEqual(objectA, objectB) {
+export function shallowEqual(
+  objectA: Record<string, unknown>,
+  objectB: Record<string, unknown>,
+): boolean {
   if (objectA === objectB) return true;
 
   const keysOfA = Object.keys(objectA);
@@ -16,11 +19,12 @@ export function shallowEqual(objectA, objectB) {
   return true;
 }
 
-export function isPromise(object = {}) {
+export function isPromise<T>(object: any = {}): object is PromiseLike<T> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return object !== null && isFunction(object.then);
 }
 
-export function getDisplayName(Component) {
+export function getDisplayName(Component: React.ComponentType): string {
   return (
     Component.displayName ||
     Component.name ||

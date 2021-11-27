@@ -17,5 +17,5 @@ export default {
     }),
     sizeSnapshot(),
   ],
-  external: mod => EXTERNAL.some(ext => mod.startsWith(ext)),
+  external: (mod) => EXTERNAL.some((ext) => mod.startsWith(ext)),
 };

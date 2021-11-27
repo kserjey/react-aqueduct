@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import omit from 'lodash/omit';
 import { shallowEqual, isPromise } from './utils';
@@ -11,23 +11,72 @@ const propTypes = {
   onRejected: PropTypes.func,
 };
 
-const getRequestProps = (props) => omit(props, Object.keys(propTypes));
-
 const defaultOptions = {
   debounce: () => false,
-  shouldDataUpdate: (props, nextProps) => !shallowEqual(props, nextProps),
+  shouldDataUpdate: (
+    props: Record<string, unknown>,
+    nextProps: Record<string, unknown>,
+  ) => !shallowEqual(props, nextProps),
 };
 
-function createRequest(initialValue, mapPropsToRequest, options) {
+interface Options<RequestProps> {
+  debounce?: (props: RequestProps) => false | number;
+  shouldDataUpdate?: (props: RequestProps, nextProps: RequestProps) => boolean;
+}
+
+type Request<DataType> = false | null | undefined | PromiseLike<DataType>;
+
+interface State<DataType> {
+  isLoading: boolean;
+  args: Record<string, unknown>;
+  data: DataType;
+  error: null | Error;
+}
+
+interface RenderProps<DataType> extends State<DataType> {
+  updateData: () => void;
+}
+
+type Props<DataType, RequestProps> = RequestProps & {
+  component?: React.ComponentType<RenderProps<DataType>>;
+  render?: (renderProps: RenderProps<DataType>) => ReactNode;
+  children?: (renderProps: RenderProps<DataType>) => ReactNode;
+  onFulfilled: (data: DataType) => void;
+  onRejected: (error: Error) => void;
+};
+
+const getRequestProps = <DataType, RequestProps extends Record<string, unknown>>({
+  component,
+  render,
+  children,
+  onFulfilled,
+  onRejected,
+  ...props
+}: Props<DataType, RequestProps>): RequestProps => props;
+
+function createRequest<DataType, RequestProps>(
+  initialValue: DataType,
+  mapPropsToRequest: (props: RequestProps) => Request<DataType>,
+  options: Options<RequestProps>,
+): React.Component {
   const { debounce, shouldDataUpdate } = {
     ...defaultOptions,
     ...options,
   };
 
-  class RequestComponent extends React.Component {
-    constructor(props) {
+  class RequestComponent extends React.Component<
+    Props<DataType, RequestProps>,
+    State<DataType>
+  > {
+    timeout: undefined | number;
+
+    requestProps: RequestProps;
+
+    request: Request<DataType>;
+
+    constructor(props: Props<DataType, RequestProps>) {
       super(props);
-      this.timeout = null;
+      this.timeout = undefined;
       this.requestProps = getRequestProps(props);
       this.request = mapPropsToRequest(this.requestProps);
       this.state = {
@@ -44,11 +93,13 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
     componentDidUpdate() {
       const nextRequestProps = getRequestProps(this.props);
+
       if (shouldDataUpdate(this.requestProps, nextRequestProps)) {
         const wait = debounce(this.requestProps, nextRequestProps);
-        if (Number.isInteger(wait) && wait > 0) {
+
+        if (typeof wait === 'number' && wait > 0) {
           clearTimeout(this.timeout);
-          this.timeout = setTimeout(() => {
+          this.timeout = window.setTimeout(() => {
             this.requestProps = nextRequestProps;
             this.fetchData(nextRequestProps);
           }, wait);
@@ -64,7 +115,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
       clearTimeout(this.timeout);
     }
 
-    setLoading = (value) => {
+    setLoading = (value: boolean) => {
       this.setState(({ isLoading }) =>
         isLoading === value ? null : { isLoading: value },
       );
@@ -75,7 +126,7 @@ function createRequest(initialValue, mapPropsToRequest, options) {
 
       if (this.timeout !== null) {
         clearTimeout(this.timeout);
-        this.timeout = null;
+        this.timeout = undefined;
       }
 
       this.request = request;
